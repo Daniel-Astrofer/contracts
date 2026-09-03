@@ -11,6 +11,27 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fmt;
 
+/// Public contract namespaces.  The root re-exports below remain available
+/// for wire-compatibility; these namespaces give adapters a stable dependency
+/// boundary instead of importing an undifferentiated contract module.
+pub mod admin {
+    pub use super::{
+        AdminErrorEnvelopeV1, AdminOnrampV1, AdminP2PV1, AdminProviderV1,
+        AdminReconciliationV1, AuditReferenceV1, NodeAdminStatusV1, VaultAdminStatusV1,
+    };
+}
+
+pub mod discovery {
+    pub use super::{
+        AdmissionRequestV1, DiscoveryPlane, GenesisTrustBundleV1, ManifestMember,
+        MembershipManifestV1, PeerHelloV1, TrustMember, TrustPlane,
+    };
+}
+
+pub mod ledger {
+    pub use super::{JournalDirection, LedgerAccountV1, LedgerJournalV1};
+}
+
 pub const DISCOVERY_CONTRACT_VERSION: &str = "0.2.0";
 pub const PEER_HELLO_DOMAIN: &[u8] = b"KEROSENE_PEER_HELLO_V1";
 pub const ADMISSION_REQUEST_DOMAIN: &[u8] = b"KEROSENE_ADMISSION_REQUEST_V1";
