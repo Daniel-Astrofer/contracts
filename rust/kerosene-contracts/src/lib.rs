@@ -11,13 +11,15 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fmt;
 
+pub mod release;
+
 /// Public contract namespaces.  The root re-exports below remain available
 /// for wire-compatibility; these namespaces give adapters a stable dependency
 /// boundary instead of importing an undifferentiated contract module.
 pub mod admin {
     pub use super::{
-        AdminErrorEnvelopeV1, AdminOnrampV1, AdminP2PV1, AdminProviderV1,
-        AdminReconciliationV1, AuditReferenceV1, NodeAdminStatusV1, VaultAdminStatusV1,
+        AdminErrorEnvelopeV1, AdminOnrampV1, AdminP2PV1, AdminProviderV1, AdminReconciliationV1,
+        AuditReferenceV1, NodeAdminStatusV1, VaultAdminStatusV1,
     };
 }
 

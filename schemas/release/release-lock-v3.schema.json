@@ -1,0 +1,415 @@
+{
+  "$id": "urn:kerosene:release-lock-v3",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "BftAuthorizationV3": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "format": "uint64",
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "members": {
+          "format": "uint64",
+          "maximum": 64,
+          "minimum": 4,
+          "type": "integer"
+        },
+        "networkId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "threshold": {
+          "format": "uint64",
+          "maximum": 64,
+          "minimum": 3,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "epoch",
+        "members",
+        "networkId",
+        "threshold"
+      ],
+      "type": "object"
+    },
+    "ReleaseAuthorizationV3": {
+      "additionalProperties": false,
+      "properties": {
+        "bft": {
+          "$ref": "#/definitions/BftAuthorizationV3"
+        },
+        "tuf": {
+          "$ref": "#/definitions/TufAuthorizationV3"
+        },
+        "vaultCompatibility": {
+          "$ref": "#/definitions/VaultCompatibilityV3"
+        }
+      },
+      "required": [
+        "bft",
+        "tuf",
+        "vaultCompatibility"
+      ],
+      "type": "object"
+    },
+    "ReleaseMigrationV3": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "enum": [
+            "reversible",
+            "approved-recovery"
+          ],
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "recoveryEvidenceDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "snapshotRequired": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "classification",
+        "id",
+        "recoveryEvidenceDigest",
+        "snapshotRequired"
+      ],
+      "type": "object"
+    },
+    "ReleaseNetworkV3": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "plane": {
+          "const": "bank",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "plane"
+      ],
+      "type": "object"
+    },
+    "ReleasePolicyV3": {
+      "additionalProperties": false,
+      "properties": {
+        "allowSourceBuild": {
+          "const": false,
+          "type": "boolean"
+        },
+        "minimumBankObservers": {
+          "format": "uint64",
+          "minimum": 3,
+          "type": "integer"
+        },
+        "vaultSignerActivation": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "allowSourceBuild",
+        "minimumBankObservers",
+        "vaultSignerActivation"
+      ],
+      "type": "object"
+    },
+    "ReleaseServiceV3": {
+      "additionalProperties": false,
+      "properties": {
+        "configDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "image": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/:@-]*@sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "repository": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "rollout": {
+          "enum": [
+            "admin",
+            "application",
+            "network",
+            "operator",
+            "quorum",
+            "stateful"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "configDigest",
+        "image",
+        "repository",
+        "rollout"
+      ],
+      "type": "object"
+    },
+    "ReleaseServicesV3": {
+      "additionalProperties": false,
+      "properties": {
+        "admin": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "bitcoin": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "core": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "kfe": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "lnd": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "node": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "postgres": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "redis": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "tor": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "vault": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        },
+        "web-page": {
+          "$ref": "#/definitions/ReleaseServiceV3"
+        }
+      },
+      "required": [
+        "admin",
+        "bitcoin",
+        "core",
+        "kfe",
+        "lnd",
+        "node",
+        "postgres",
+        "redis",
+        "tor",
+        "vault",
+        "web-page"
+      ],
+      "type": "object"
+    },
+    "ReleaseSourceV3": {
+      "additionalProperties": false,
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/SourceBundleV3"
+        },
+        "repositories": {
+          "$ref": "#/definitions/SourceRepositoriesV3"
+        }
+      },
+      "required": [
+        "bundle",
+        "repositories"
+      ],
+      "type": "object"
+    },
+    "SourceBundleV3": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "uri": {
+          "pattern": "^oci://.+@sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "digest",
+        "uri"
+      ],
+      "type": "object"
+    },
+    "SourceRepositoriesV3": {
+      "additionalProperties": false,
+      "properties": {
+        "admin": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "clients": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "contracts": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "core": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "deploy": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "kfe": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "node": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "rails": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "shared": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        },
+        "vault": {
+          "$ref": "#/definitions/SourceRepositoryV3"
+        }
+      },
+      "required": [
+        "admin",
+        "clients",
+        "contracts",
+        "core",
+        "deploy",
+        "kfe",
+        "node",
+        "rails",
+        "shared",
+        "vault"
+      ],
+      "type": "object"
+    },
+    "SourceRepositoryV3": {
+      "additionalProperties": false,
+      "properties": {
+        "bundleDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "commit": {
+          "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bundleDigest",
+        "commit"
+      ],
+      "type": "object"
+    },
+    "TufAuthorizationV3": {
+      "additionalProperties": false,
+      "properties": {
+        "targetPath": {
+          "pattern": "^releases/[a-z0-9][a-z0-9._-]{2,127}\\.json$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetPath"
+      ],
+      "type": "object"
+    },
+    "VaultCompatibilityV3": {
+      "additionalProperties": false,
+      "properties": {
+        "attestationDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "members": {
+          "format": "uint64",
+          "maximum": 64,
+          "minimum": 3,
+          "type": "integer"
+        },
+        "threshold": {
+          "format": "uint64",
+          "maximum": 64,
+          "minimum": 2,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "attestationDigest",
+        "members",
+        "threshold"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "authorization": {
+      "$ref": "#/definitions/ReleaseAuthorizationV3"
+    },
+    "migration": {
+      "$ref": "#/definitions/ReleaseMigrationV3"
+    },
+    "network": {
+      "$ref": "#/definitions/ReleaseNetworkV3"
+    },
+    "policy": {
+      "$ref": "#/definitions/ReleasePolicyV3"
+    },
+    "releaseId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "kerosene.release-lock/v3",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 3,
+      "format": "uint8",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "sequence": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "services": {
+      "$ref": "#/definitions/ReleaseServicesV3"
+    },
+    "source": {
+      "$ref": "#/definitions/ReleaseSourceV3"
+    }
+  },
+  "required": [
+    "authorization",
+    "migration",
+    "network",
+    "policy",
+    "releaseId",
+    "schema",
+    "schemaVersion",
+    "sequence",
+    "services",
+    "source"
+  ],
+  "title": "ReleaseLockV3",
+  "type": "object"
+}

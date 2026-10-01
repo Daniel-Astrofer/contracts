@@ -1,0 +1,154 @@
+{
+  "approval": {
+    "epoch": 1,
+    "networkId": "bank-release-governance",
+    "previousApprovalDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+    "schema": "kerosene.release-approval/v1",
+    "sequence": 42
+  },
+  "approvalCanonicalDigest": "sha256:b3e6d52b98343f0e470efa65058a082fd123ef2f1fe751b3cbdd01cd4676a74a",
+  "bankRead": {
+    "challenge": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expiresAt": "2026-10-01T21:00:45Z",
+    "issuedAt": "2026-10-01T21:00:00Z",
+    "networkId": "bank-mainnet",
+    "observation": {
+      "observedAt": "2026-10-01T21:00:00Z",
+      "observedSequence": 42,
+      "observerId": "bank-001",
+      "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+      "status": "compatible"
+    },
+    "releaseId": "bank-mainnet-2026.09.28.1",
+    "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+    "schema": "kerosene.bank-release-read/v1",
+    "signatures": [
+      {
+        "memberId": "bank-001",
+        "publicKeyDerBase64": "MCowBQYDK2VwAyEAE5j2LG0aRXxRumpLXz29L2n8qTIWIY3ImX5Ba9F9k8o=",
+        "signatureBase64": "UqU2xRmNqiJgtBqZtZUcfdAcnfZeOKFV3sHsu6ASPU/1cXXhmPpn2feP7O58can8ZUVWdVfgs7XOiG9wvLchCA=="
+      }
+    ],
+    "source": "bank-runtime",
+    "targetSequence": 42
+  },
+  "bankReadPayloadCanonicalDigest": "sha256:18490854507c0ebadb28d3709b47b2eba8a634f20730e48c1c10151671e3dafe",
+  "fixtureOnly": true,
+  "observationPayloadCanonicalDigest": "sha256:2f4acb6d0cd612555f1bf2a40d001677483ac8c34b3654350742ccf778881038",
+  "reads": {
+    "observations": [
+      {
+        "bankRead": {
+          "challenge": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "expiresAt": "2026-10-01T21:00:45Z",
+          "issuedAt": "2026-10-01T21:00:00Z",
+          "networkId": "bank-mainnet",
+          "observation": {
+            "observedAt": "2026-10-01T21:00:00Z",
+            "observedSequence": 42,
+            "observerId": "bank-001",
+            "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+            "status": "compatible"
+          },
+          "releaseId": "bank-mainnet-2026.09.28.1",
+          "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+          "schema": "kerosene.bank-release-read/v1",
+          "signatures": [
+            {
+              "memberId": "bank-001",
+              "publicKeyDerBase64": "MCowBQYDK2VwAyEAE5j2LG0aRXxRumpLXz29L2n8qTIWIY3ImX5Ba9F9k8o=",
+              "signatureBase64": "UqU2xRmNqiJgtBqZtZUcfdAcnfZeOKFV3sHsu6ASPU/1cXXhmPpn2feP7O58can8ZUVWdVfgs7XOiG9wvLchCA=="
+            }
+          ],
+          "source": "bank-runtime",
+          "targetSequence": 42
+        },
+        "commitCertificate": "unavailable",
+        "expiresAt": "2026-10-01T21:00:45Z",
+        "issuedAt": "2026-10-01T21:00:00Z",
+        "networkId": "bank-mainnet",
+        "observation": {
+          "observedAt": "2026-10-01T21:00:00Z",
+          "observedSequence": 42,
+          "observerId": "bank-001",
+          "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+          "status": "compatible"
+        },
+        "releaseId": "bank-mainnet-2026.09.28.1",
+        "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+        "schema": "kerosene.signed-release-observation/v1",
+        "signatures": [
+          {
+            "memberId": "bank-001",
+            "publicKeyDerBase64": "MCowBQYDK2VwAyEA6kpsY+KcUgq+9VB7Ey7F+ZVHdq6+vnuSQh7qaRRG0iw=",
+            "signatureBase64": "UK9hUIm5Pm0k5NilgpUHT91M523Jjdpz51z83PEWxYbcWD4oc7bvX9TpBfNYmIPVcKBUuVHjBMa2Xm17J10SAw=="
+          }
+        ],
+        "targetSequence": 42
+      }
+    ],
+    "schema": "kerosene.release-observations/v1"
+  },
+  "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+  "report": {
+    "expiresAt": "2026-10-01T21:05:00Z",
+    "issuedAt": "2026-10-01T21:00:00Z",
+    "networkId": "bank-mainnet",
+    "observations": [
+      {
+        "observedAt": "2026-10-01T21:00:00Z",
+        "observedSequence": 42,
+        "observerId": "bank-001",
+        "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+        "status": "compatible"
+      },
+      {
+        "observedAt": "2026-10-01T21:00:00Z",
+        "observedSequence": 42,
+        "observerId": "bank-002",
+        "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+        "status": "compatible"
+      },
+      {
+        "observedAt": "2026-10-01T21:00:00Z",
+        "observedSequence": 42,
+        "observerId": "bank-003",
+        "releaseDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+        "status": "compatible"
+      }
+    ],
+    "releaseId": "bank-mainnet-2026.09.28.1",
+    "releaseLockCanonicalDigest": "sha256:deb87540a5cad977036563bc496be101709505bc04c944ad9badc3cb532f9166",
+    "schema": "kerosene.bank-observer-report/v2",
+    "signatures": [
+      {
+        "memberId": "bank-001",
+        "publicKeyDerBase64": "MCowBQYDK2VwAyEA6kpsY+KcUgq+9VB7Ey7F+ZVHdq6+vnuSQh7qaRRG0iw=",
+        "signatureBase64": "c6VIpkyRQBHAZPY0sR8Sax1XmsQIsB96SpwQZX6Zi9A7ogmgUqXWx98cEnUwKLb37UPhX+1ewElutcAu8A90Dw=="
+      },
+      {
+        "memberId": "bank-002",
+        "publicKeyDerBase64": "MCowBQYDK2VwAyEA/RckOFqgx1tk+3jNYC+h2ZH96/drE8WO1wLqyDXp9hg=",
+        "signatureBase64": "0hs25G2CauncY3vE0uUTxnHE59PkC1CBTM+f1w/Eo1pwbaTBLUJautPZyBBvA0FVENVox9C+gaKalIKj969kAg=="
+      },
+      {
+        "memberId": "bank-003",
+        "publicKeyDerBase64": "MCowBQYDK2VwAyEAQ6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg+6/Tw=",
+        "signatureBase64": "A7hH78GSbv/1mpm6jcV+FvhU2O3aiQO2L8QurrYfC9Oq0Hs9b1KL6u07XeO/bwRW91kbzEV7BnKdEFrV7WSmBQ=="
+      }
+    ],
+    "targetSequence": 42
+  },
+  "reportPayloadCanonicalDigest": "sha256:f89a6aa1963335f2911b5012bb42bd6ffcefbe0eeb6be9ec40c9e7dd03b2fd1d",
+  "roster": {
+    "members": {
+      "bank-001": "MCowBQYDK2VwAyEA6kpsY+KcUgq+9VB7Ey7F+ZVHdq6+vnuSQh7qaRRG0iw=",
+      "bank-002": "MCowBQYDK2VwAyEA/RckOFqgx1tk+3jNYC+h2ZH96/drE8WO1wLqyDXp9hg=",
+      "bank-003": "MCowBQYDK2VwAyEAQ6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg+6/Tw=",
+      "bank-004": "MCowBQYDK2VwAyEAZr5+Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo="
+    },
+    "networkId": "bank-release-governance",
+    "schema": "kerosene.release-roster/v1"
+  }
+}

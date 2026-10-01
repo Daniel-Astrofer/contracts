@@ -1,0 +1,144 @@
+{
+  "$id": "urn:kerosene:bank-release-read-v1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "BankObservationV2": {
+      "additionalProperties": false,
+      "properties": {
+        "observedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "observedSequence": {
+          "format": "uint64",
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observerId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "releaseDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/Compatibility"
+        }
+      },
+      "required": [
+        "observedAt",
+        "observedSequence",
+        "observerId",
+        "releaseDigest",
+        "status"
+      ],
+      "type": "object"
+    },
+    "BankReadSource": {
+      "enum": [
+        "bank-runtime",
+        "synthetic"
+      ],
+      "type": "string"
+    },
+    "Compatibility": {
+      "enum": [
+        "compatible",
+        "incompatible",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "ReleaseSignatureV1": {
+      "additionalProperties": false,
+      "properties": {
+        "memberId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "publicKeyDerBase64": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "signatureBase64": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "memberId",
+        "publicKeyDerBase64",
+        "signatureBase64"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "challenge": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "expiresAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "networkId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "observation": {
+      "$ref": "#/definitions/BankObservationV2"
+    },
+    "releaseId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "releaseLockCanonicalDigest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "kerosene.bank-release-read/v1",
+      "type": "string"
+    },
+    "signatures": {
+      "items": {
+        "$ref": "#/definitions/ReleaseSignatureV1"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "type": "array"
+    },
+    "source": {
+      "$ref": "#/definitions/BankReadSource"
+    },
+    "targetSequence": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "challenge",
+    "expiresAt",
+    "issuedAt",
+    "networkId",
+    "observation",
+    "releaseId",
+    "releaseLockCanonicalDigest",
+    "schema",
+    "signatures",
+    "source",
+    "targetSequence"
+  ],
+  "title": "BankReleaseReadV1",
+  "type": "object"
+}
