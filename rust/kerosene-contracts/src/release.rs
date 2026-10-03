@@ -249,6 +249,101 @@ wire!(ReleaseApprovalV1 {
     release_lock_canonical_digest: String,
     previous_approval_digest: String,
 });
+// Initial-install intent, not an ordered consensus certificate or activation.
+wire!(CellAdmissionV1 {
+    schema: String,
+    network_id: String,
+    epoch: u64,
+    cell_id: String,
+    cluster_uid: String,
+    release_approval_digest: String,
+    operator_id: String,
+    change_id: String,
+    issued_at_unix_seconds: u64,
+    expires_at_unix_seconds: u64,
+    nonce: String,
+});
+
+impl CellAdmissionV1 {
+    /// Shape/time validation only. Consumers must verify pinned quorum,
+    /// consensus approval, live cluster binding and authoritative consumption.
+    pub fn validate_at(&self, now_unix_seconds: u64) -> Result<(), &'static str> {
+        if self.schema != "kerosene.cell-admission/v1"
+            || [
+                &self.network_id,
+                &self.cell_id,
+                &self.operator_id,
+                &self.change_id,
+            ]
+            .iter()
+            .any(|v| !valid_identifier(v))
+            || self.epoch == 0
+            || self.epoch > MAX_SEQUENCE
+            || self.cluster_uid.len() != 36
+            || !self.cluster_uid.bytes().enumerate().all(|(i, c)| {
+                if [8, 13, 18, 23].contains(&i) {
+                    c == b'-'
+                } else {
+                    c.is_ascii_digit() || (b'a'..=b'f').contains(&c)
+                }
+            })
+            || !valid_digest(&self.release_approval_digest)
+            || self.nonce.len() != 64
+            || !self
+                .nonce
+                .bytes()
+                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+            || self.issued_at_unix_seconds == 0
+            || self.expires_at_unix_seconds > MAX_SEQUENCE
+            || self.expires_at_unix_seconds <= self.issued_at_unix_seconds
+            || self.expires_at_unix_seconds - self.issued_at_unix_seconds > 3600
+            || now_unix_seconds < self.issued_at_unix_seconds
+            || now_unix_seconds >= self.expires_at_unix_seconds
+        {
+            return Err("invalid or expired Cell admission");
+        }
+        Ok(())
+    }
+    pub fn digest(&self) -> String {
+        format!("sha256:{}", crate::canonical_json_hash(self))
+    }
+}
+wire!(CellAdmissionSignatureV1 {
+    member_id: String,
+    signature_base64: String,
+});
+wire!(CellAdmissionEnvelopeV1 {
+    admission: CellAdmissionV1,
+    signatures: Vec<CellAdmissionSignatureV1>,
+});
+
+impl CellAdmissionEnvelopeV1 {
+    /// This checks encoding/shape only, NOT cryptographic quorum authorization.
+    /// No public keys are accepted from the untrusted envelope.
+    pub fn validate_structure_at(&self, now_unix_seconds: u64) -> Result<(), &'static str> {
+        self.admission.validate_at(now_unix_seconds)?;
+        if self.signatures.is_empty() || self.signatures.len() > MAX_OBSERVERS {
+            return Err("invalid Cell admission signature set");
+        }
+        let mut members = std::collections::HashSet::new();
+        for signature in &self.signatures {
+            let encoded = signature.signature_base64.as_bytes();
+            // Canonical padded Base64 for exactly 64 Ed25519 signature bytes.
+            if !valid_identifier(&signature.member_id)
+                || !members.insert(&signature.member_id)
+                || encoded.len() != 88
+                || !encoded[..85]
+                    .iter()
+                    .all(|c| c.is_ascii_alphanumeric() || *c == b'+' || *c == b'/')
+                || !b"AQgw".contains(&encoded[85])
+                || &encoded[86..] != b"=="
+            {
+                return Err("invalid Cell admission signature set");
+            }
+        }
+        Ok(())
+    }
+}
 wire!(BftAuthorizationV3 {
     network_id: String,
     epoch: u64,

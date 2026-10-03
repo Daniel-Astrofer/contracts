@@ -9,8 +9,148 @@ fn fixture() -> Value {
     ))
     .unwrap()
 }
+#[test]
+fn admission_public_vector_has_exact_canonical_bytes_and_valid_signatures() {
+    let vector: Value =
+        serde_json::from_str(include_str!("../../../test-vectors/cell-admission-v1.json")).unwrap();
+    assert_eq!(vector["fixtureOnly"], true);
+    let envelope: CellAdmissionEnvelopeV1 =
+        decode_release_json(&serde_json::to_vec(&vector["envelope"]).unwrap()).unwrap();
+    envelope
+        .validate_structure_at(vector["nowUnixSeconds"].as_u64().unwrap())
+        .unwrap();
+    assert_eq!(envelope.admission.digest(), vector["admissionDigest"]);
+    assert_eq!(
+        String::from_utf8(canonical_json_bytes(&envelope.admission)).unwrap(),
+        vector["canonicalPayloadUtf8"]
+    );
+    for signature in &envelope.signatures {
+        let encoded = vector["policy"]["members"][&signature.member_id]
+            .as_str()
+            .unwrap();
+        let bytes: [u8; 32] = STANDARD.decode(encoded).unwrap().try_into().unwrap();
+        let key = VerifyingKey::from_bytes(&bytes).unwrap();
+        let sig =
+            Signature::from_slice(&STANDARD.decode(&signature.signature_base64).unwrap()).unwrap();
+        key.verify_strict(&canonical_json_bytes(&envelope.admission), &sig)
+            .unwrap();
+    }
+}
 fn lock() -> Value {
     serde_json::from_str(include_str!("../../../test-vectors/release-lock-v3.json")).unwrap()
+}
+#[test]
+fn cell_admission_is_strict_time_bounded_and_binds_every_field() {
+    let value = json!({"schema":"kerosene.cell-admission/v1", "networkId":"bank-release-governance",
+        "epoch":1,"cellId":"cell-example","clusterUid":"80cf8d2f-172d-4d43-ba99-1734b32184b1",
+        "releaseApprovalDigest":format!("sha256:{}", "a".repeat(64)), "operatorId":"operator-example",
+        "changeId":"change-example", "issuedAtUnixSeconds":1000,"expiresAtUnixSeconds":1100,
+        "nonce":"b".repeat(64)});
+    let admission: CellAdmissionV1 =
+        decode_release_json(&serde_json::to_vec(&value).unwrap()).unwrap();
+    admission.validate_at(1000).unwrap();
+    let signature = CellAdmissionSignatureV1 {
+        member_id: "validator-one".into(),
+        signature_base64: STANDARD.encode([0u8; 64]),
+    };
+    let envelope = CellAdmissionEnvelopeV1 {
+        admission: admission.clone(),
+        signatures: vec![signature.clone()],
+    };
+    envelope.validate_structure_at(1000).unwrap();
+    let schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/release/cell-admission-envelope-v1.schema.json"
+    ))
+    .unwrap();
+    let validator = jsonschema::validator_for(&schema).unwrap();
+    let encoded_envelope = serde_json::to_value(&envelope).unwrap();
+    assert!(validator.is_valid(&encoded_envelope));
+    for (field, invalid) in [
+        ("clusterUid", json!("foreign-cluster")),
+        ("epoch", json!(MAX_SEQUENCE + 1)),
+        ("nonce", json!("short")),
+        ("issuedAtUnixSeconds", json!(0)),
+        ("expiresAtUnixSeconds", json!(MAX_SEQUENCE + 1)),
+        ("schema", json!("kerosene.release-approval/v1")),
+    ] {
+        let mut changed = encoded_envelope.clone();
+        changed["admission"][field] = invalid;
+        assert!(!validator.is_valid(&changed), "schema accepted {field}");
+    }
+    let mut changed = encoded_envelope.clone();
+    changed["signatures"][0]["signatureBase64"] = json!(format!("{}B==", "A".repeat(85)));
+    assert!(!validator.is_valid(&changed));
+    changed = encoded_envelope.clone();
+    changed["signatures"] = json!([]);
+    assert!(!validator.is_valid(&changed));
+    // Even a zero signature passes shape: cryptographic verification is mandatory elsewhere.
+    for signatures in [
+        vec![],
+        vec![signature.clone(), signature.clone()],
+        vec![signature.clone(); 65],
+    ] {
+        assert!(CellAdmissionEnvelopeV1 {
+            signatures,
+            ..envelope.clone()
+        }
+        .validate_structure_at(1000)
+        .is_err());
+    }
+    for encoded in [
+        "".to_string(),
+        STANDARD.encode([0u8; 63]),
+        STANDARD.encode([0u8; 65]),
+        format!("{}B==", "A".repeat(85)),
+        format!("{}A==", "!".repeat(85)),
+    ] {
+        let altered = CellAdmissionEnvelopeV1 {
+            signatures: vec![CellAdmissionSignatureV1 {
+                signature_base64: encoded,
+                ..signature.clone()
+            }],
+            ..envelope.clone()
+        };
+        assert!(altered.validate_structure_at(1000).is_err());
+    }
+    let mut injected = serde_json::to_value(&envelope).unwrap();
+    injected["signatures"][0]["publicKey"] = json!("caller-selected-authority");
+    assert!(!validator.is_valid(&injected));
+    assert!(decode_release_json::<CellAdmissionEnvelopeV1>(
+        &serde_json::to_vec(&injected).unwrap()
+    )
+    .is_err());
+    admission.validate_at(1099).unwrap();
+    assert!(admission.validate_at(999).is_err());
+    assert!(admission.validate_at(1100).is_err());
+    for (field, replacement) in [
+        ("epoch", json!(MAX_SEQUENCE + 1)),
+        ("clusterUid", json!("foreign")),
+        ("nonce", json!("B".repeat(64))),
+        ("expiresAtUnixSeconds", json!(4601)),
+        ("expiresAtUnixSeconds", json!(1000)),
+        ("releaseApprovalDigest", json!("unsigned")),
+    ] {
+        let mut altered = value.clone();
+        altered[field] = replacement;
+        let typed: CellAdmissionV1 = serde_json::from_value(altered).unwrap();
+        assert!(typed.validate_at(1000).is_err(), "{field}");
+    }
+    let mut unknown = value.clone();
+    unknown["compatible"] = json!(true);
+    assert!(
+        decode_release_json::<CellAdmissionV1>(&serde_json::to_vec(&unknown).unwrap()).is_err()
+    );
+    let raw = serde_json::to_string(&value)
+        .unwrap()
+        .replacen("{", "{\"epoch\":1,", 1);
+    assert!(decode_release_json::<CellAdmissionV1>(raw.as_bytes()).is_err());
+    for field in ["cellId", "networkId", "operatorId", "changeId"] {
+        let mut changed = value.clone();
+        changed[field] = json!("different-identity");
+        let typed: CellAdmissionV1 = serde_json::from_value(changed).unwrap();
+        typed.validate_at(1000).unwrap();
+        assert_ne!(typed.digest(), admission.digest());
+    }
 }
 fn verify<T: serde::Serialize>(payload: &T, signature: &ReleaseSignatureV1) {
     let key = VerifyingKey::from_public_key_der(

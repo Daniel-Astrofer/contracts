@@ -1,4 +1,4 @@
-//! Print generated schemas; --check verifies committed artifacts without writes.
+//! Print schemas; --check verifies artifacts; --write regenerates fixed paths.
 use kerosene_contracts::release::*;
 use schemars::{schema_for, JsonSchema};
 
@@ -14,12 +14,22 @@ fn schema<T: JsonSchema>(name: &str, check: bool) {
         let actual: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
         assert!(actual == value, "generated schema drift: {name}");
+    } else if std::env::args().any(|v| v == "--write") {
+        std::fs::write(
+            format!("schemas/release/{name}.schema.json"),
+            format!("{}\n", serde_json::to_string_pretty(&value).unwrap()),
+        )
+        .unwrap();
     } else {
         println!("{name}\n{}", serde_json::to_string_pretty(&value).unwrap());
     }
 }
 fn main() {
     let check = std::env::args().any(|v| v == "--check");
+    assert!(
+        !(check && std::env::args().any(|v| v == "--write")),
+        "--check and --write are mutually exclusive"
+    );
     schema::<BankObserverReportV2>("bank-observer-report-v2", check);
     schema::<BankReleaseReadV1>("bank-release-read-v1", check);
     schema::<ReleaseObservationsV1>("release-observations-v1", check);
@@ -27,6 +37,8 @@ fn main() {
     schema::<ObserverDiscoveryV1>("release-observer-discovery-v1", check);
     schema::<ReleaseLockV3>("release-lock-v3", check);
     schema::<ReleaseApprovalV1>("release-approval-v1", check);
+    schema::<CellAdmissionV1>("cell-admission-v1", check);
+    schema::<CellAdmissionEnvelopeV1>("cell-admission-envelope-v1", check);
 }
 
 // Wire constraints and schema tags augment the derived shapes. Constants and
@@ -43,19 +55,23 @@ fn decorate(value: &mut serde_json::Value, name: &str) {
     };
     for (field, schema) in properties.iter_mut() {
         let constraint = match field.as_str() {
-            "observerId" | "memberId" | "networkId" | "releaseId" | "id" | "repository" => {
-                Some(("pattern", json!(IDENTIFIER_PATTERN)))
-            }
+            "observerId" | "memberId" | "networkId" | "releaseId" | "id" | "repository"
+            | "cellId" | "operatorId" | "changeId" => Some(("pattern", json!(IDENTIFIER_PATTERN))),
             "releaseLockCanonicalDigest"
             | "releaseDigest"
             | "previousApprovalDigest"
+            | "releaseApprovalDigest"
             | "digest"
             | "bundleDigest"
             | "configDigest"
             | "attestationDigest"
             | "recoveryEvidenceDigest" => Some(("pattern", json!(DIGEST_PATTERN))),
             "issuedAt" | "expiresAt" | "observedAt" => Some(("format", json!("date-time"))),
-            "challenge" => Some(("pattern", json!("^[0-9a-f]{64}$"))),
+            "challenge" | "nonce" => Some(("pattern", json!("^[0-9a-f]{64}$"))),
+            "clusterUid" => Some((
+                "pattern",
+                json!("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"),
+            )),
             "commit" => Some(("pattern", json!("^(?:[0-9a-f]{40}|[0-9a-f]{64})$"))),
             "targetPath" => Some((
                 "pattern",
@@ -83,7 +99,16 @@ fn decorate(value: &mut serde_json::Value, name: &str) {
         if let Some((key, constraint)) = constraint {
             schema[key] = constraint;
         }
-        if ["targetSequence", "sequence", "epoch", "observedSequence"].contains(&field.as_str()) {
+        if [
+            "targetSequence",
+            "sequence",
+            "epoch",
+            "observedSequence",
+            "issuedAtUnixSeconds",
+            "expiresAtUnixSeconds",
+        ]
+        .contains(&field.as_str())
+        {
             schema["minimum"] = json!(if field == "observedSequence" { 0 } else { 1 });
             schema["maximum"] = json!(MAX_SEQUENCE);
         }
@@ -105,12 +130,17 @@ fn decorate(value: &mut serde_json::Value, name: &str) {
         "ObserverDiscoveryV1" => Some("kerosene.release-observer-discovery/v1"),
         "ReleaseLockV3" => Some("kerosene.release-lock/v3"),
         "ReleaseApprovalV1" => Some("kerosene.release-approval/v1"),
+        "CellAdmissionV1" => Some("kerosene.cell-admission/v1"),
         _ => None,
     };
     if let Some(tag) = tag {
         properties.get_mut("schema").unwrap()["const"] = json!(tag);
     }
     match name {
+        "CellAdmissionSignatureV1" => {
+            properties.get_mut("signatureBase64").unwrap()["pattern"] =
+                json!("^[A-Za-z0-9+/]{85}[AQgw]==$");
+        }
         "ReleaseLockV3" => {
             properties.get_mut("schemaVersion").unwrap()["const"] = json!(3);
             properties.get_mut("schemaVersion").unwrap()["minimum"] = json!(0);

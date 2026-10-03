@@ -1,0 +1,72 @@
+{
+  "$id": "urn:kerosene:cell-admission-v1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "cellId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "changeId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "clusterUid": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "type": "string"
+    },
+    "epoch": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "expiresAtUnixSeconds": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "issuedAtUnixSeconds": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "networkId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "nonce": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "operatorId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "releaseApprovalDigest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "kerosene.cell-admission/v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "cellId",
+    "changeId",
+    "clusterUid",
+    "epoch",
+    "expiresAtUnixSeconds",
+    "issuedAtUnixSeconds",
+    "networkId",
+    "nonce",
+    "operatorId",
+    "releaseApprovalDigest",
+    "schema"
+  ],
+  "title": "CellAdmissionV1",
+  "type": "object"
+}
