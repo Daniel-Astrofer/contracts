@@ -5,7 +5,18 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
- * P2P channel admin contract.
+ * Administrative snapshot of a peer-to-peer Lightning channel.
+ * Capacity must be positive and reported local/remote balances non-negative.
+ * JSON property names use snake_case.
+ *
+ * @param contractVersion schema version understood by producer and consumer
+ * @param requestId identifier correlating this channel snapshot to the request
+ * @param channelId stable channel identifier
+ * @param remoteNodeId public node identifier of the remote channel peer
+ * @param capacitySats total channel capacity in satoshis; must be positive
+ * @param localBalanceSats local side's reported channel balance in satoshis
+ * @param remoteBalanceSats remote side's reported channel balance in satoshis
+ * @param isActive whether the channel is currently active for routing or payments
  */
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AdminP2PV1(
@@ -18,6 +29,7 @@ public record AdminP2PV1(
         @JsonProperty("remote_balance_sats") long remoteBalanceSats,
         @JsonProperty("is_active") boolean isActive) {
 
+    /** Enforces required identities, positive capacity, and non-negative balances. */
     public AdminP2PV1 {
         if (contractVersion == null || contractVersion.isBlank())
             throw new IllegalArgumentException("contractVersion required");

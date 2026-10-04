@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.kerosene.invalid/admin/reconciliation/report-v1.schema.json",
+  "title": "AdminReconciliationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "reconciliation_id",
+    "ledger_sats",
+    "onchain_sats",
+    "lightning_sats",
+    "delta_sats",
+    "status"
+  ],
+  "properties": {
+    "contract_version": {"const": "0.1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "reconciliation_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "ledger_sats": {"type": "integer", "minimum": 0},
+    "onchain_sats": {"type": "integer", "minimum": 0},
+    "lightning_sats": {"type": "integer", "minimum": 0},
+    "delta_sats": {"type": "integer"},
+    "status": {"type": "string", "minLength": 1, "maxLength": 64},
+    "reconciled_at": {"type": "string", "minLength": 1, "maxLength": 64}
+  }
+}

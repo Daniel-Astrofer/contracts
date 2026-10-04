@@ -5,7 +5,16 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
- * Provider admin contract.
+ * Administrative health and identity snapshot for a financial provider.
+ * JSON property names use snake_case; optional heartbeat and version data may be absent.
+ *
+ * @param contractVersion schema version understood by producer and consumer
+ * @param requestId identifier correlating this snapshot to the administrative request
+ * @param providerId stable identifier for the provider instance or integration
+ * @param providerType provider category, such as a financial rail or custody adapter
+ * @param isOnline whether the provider currently reports itself available
+ * @param lastHeartbeat timestamp of the last provider health signal, when available
+ * @param version provider software or protocol version, when reported
  */
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AdminProviderV1(
@@ -17,6 +26,7 @@ public record AdminProviderV1(
         @JsonProperty("last_heartbeat") String lastHeartbeat,
         String version) {
 
+    /** Ensures version and provider identifiers are present. */
     public AdminProviderV1 {
         if (contractVersion == null || contractVersion.isBlank())
             throw new IllegalArgumentException("contractVersion required");
