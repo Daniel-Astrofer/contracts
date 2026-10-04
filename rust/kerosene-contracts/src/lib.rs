@@ -26,7 +26,7 @@ pub mod admin {
 pub mod discovery {
     pub use super::{
         AdmissionRequestV1, DiscoveryPlane, GenesisTrustBundleV1, ManifestMember,
-        MembershipManifestV1, PeerHelloV1, TrustMember, TrustPlane,
+        MembershipManifestV1, PeerHelloV1, StateSnapshotAttestationV1, TrustMember, TrustPlane,
     };
 }
 
@@ -39,6 +39,7 @@ pub const PEER_HELLO_DOMAIN: &[u8] = b"KEROSENE_PEER_HELLO_V1";
 pub const ADMISSION_REQUEST_DOMAIN: &[u8] = b"KEROSENE_ADMISSION_REQUEST_V1";
 pub const MEMBERSHIP_MANIFEST_DOMAIN: &[u8] = b"KEROSENE_MEMBERSHIP_MANIFEST_V1";
 pub const GENESIS_TRUST_BUNDLE_DOMAIN: &[u8] = b"KEROSENE_GENESIS_TRUST_BUNDLE_V1";
+pub const STATE_SNAPSHOT_ATTESTATION_DOMAIN: &[u8] = b"KEROSENE_STATE_SNAPSHOT_ATTESTATION_V1";
 pub const ADMIN_CONTRACT_VERSION: &str = "0.1.0";
 pub const ADMIN_NODE_STATUS_DOMAIN: &[u8] = b"KEROSENE_ADMIN_NODE_STATUS_V1";
 pub const ADMIN_VAULT_STATUS_DOMAIN: &[u8] = b"KEROSENE_ADMIN_VAULT_STATUS_V1";
@@ -358,6 +359,22 @@ pub struct MembershipManifestV1 {
     pub signatures: Vec<ManifestSignature>,
 }
 
+/// Threshold-signed binding between a verified membership epoch and external
+/// state bytes. The payload itself is transported separately and must hash to
+/// `state_root` before a Node may become financially ready.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StateSnapshotAttestationV1 {
+    pub contract_version: String,
+    pub network_id: String,
+    pub plane: DiscoveryPlane,
+    pub membership_manifest_hash: String,
+    pub snapshot_epoch: u64,
+    pub state_root: String,
+    pub created_at_epoch_ms: u64,
+    pub signatures: Vec<ManifestSignature>,
+}
+
 // ---------------------------------------------------------------------------
 // Canonical JSON — cross-language deterministic JSON
 // ---------------------------------------------------------------------------
@@ -479,6 +496,20 @@ impl CanonicalSignable for MembershipManifestV1 {
             }
             None => field(&mut out, b"none"),
         }
+        out
+    }
+}
+
+impl CanonicalSignable for StateSnapshotAttestationV1 {
+    fn signing_bytes(&self) -> Vec<u8> {
+        let mut out = domain(STATE_SNAPSHOT_ATTESTATION_DOMAIN);
+        field(&mut out, self.contract_version.as_bytes());
+        field(&mut out, self.network_id.as_bytes());
+        field(&mut out, self.plane.as_str().as_bytes());
+        field(&mut out, self.membership_manifest_hash.as_bytes());
+        integer(&mut out, self.snapshot_epoch);
+        field(&mut out, self.state_root.as_bytes());
+        integer(&mut out, self.created_at_epoch_ms);
         out
     }
 }
@@ -783,6 +814,28 @@ mod tests {
             signature: "1".repeat(128),
         });
         assert_eq!(unsigned, canonical_hash(&manifest));
+    }
+
+    #[test]
+    fn snapshot_attestation_binds_membership_and_payload_but_not_signatures() {
+        let mut attestation = StateSnapshotAttestationV1 {
+            contract_version: DISCOVERY_CONTRACT_VERSION.into(),
+            network_id: "kerosene-test".into(),
+            plane: DiscoveryPlane::Bank,
+            membership_manifest_hash: "1".repeat(64),
+            snapshot_epoch: 7,
+            state_root: "2".repeat(64),
+            created_at_epoch_ms: 42,
+            signatures: vec![],
+        };
+        let unsigned = canonical_hash(&attestation);
+        attestation.signatures.push(ManifestSignature {
+            signer_id: "member-a".into(),
+            signature: "3".repeat(128),
+        });
+        assert_eq!(unsigned, canonical_hash(&attestation));
+        attestation.state_root = "4".repeat(64);
+        assert_ne!(unsigned, canonical_hash(&attestation));
     }
 
     #[test]
