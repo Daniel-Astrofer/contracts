@@ -1,0 +1,392 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kerosene:financial:payment-approval:v1",
+  "title": "KFE canonical request-bound Device Key approval v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    }
+  ],
+  "$defs": {
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "userId",
+        "deviceRef",
+        "idempotencyKey",
+        "rail",
+        "direction",
+        "sourceWalletId",
+        "destinationWalletId",
+        "amountSats",
+        "networkFeeSats",
+        "externalReference",
+        "memo",
+        "paymentRequestPublicId",
+        "feeRateSatPerVbyte",
+        "feeTargetBlocks",
+        "quoteId"
+      ],
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "deviceRef": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "maxLength": 180,
+          "minLength": 1
+        },
+        "rail": {
+          "enum": [
+            "INTERNAL",
+            "ONCHAIN",
+            "LIGHTNING"
+          ]
+        },
+        "direction": {
+          "enum": [
+            "INTERNAL",
+            "OUTBOUND"
+          ]
+        },
+        "sourceWalletId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "destinationWalletId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "amountSats": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2100000000000000
+        },
+        "networkFeeSats": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2100000000000000
+        },
+        "externalReference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 8192
+        },
+        "memo": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        },
+        "paymentRequestPublicId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 180
+        },
+        "feeRateSatPerVbyte": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "feeTargetBlocks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "quoteId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "rail": {
+                "const": "INTERNAL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "direction": {
+                "const": "INTERNAL"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "direction": {
+                "const": "OUTBOUND"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "type",
+        "credentialId",
+        "deviceInstallId",
+        "signedPayload",
+        "signature"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "type": {
+          "const": "FINANCIAL_DEVICE_KEY"
+        },
+        "credentialId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "deviceInstallId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "signedPayload": {
+          "type": "string",
+          "maxLength": 8192,
+          "minLength": 1
+        },
+        "signature": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "purpose",
+        "challengeId",
+        "challenge",
+        "bindingHash",
+        "username",
+        "onionServiceId",
+        "issuedAtEpochSeconds",
+        "expiresAtEpochSeconds",
+        "algorithm",
+        "canonicalization"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "purpose": {
+          "const": "KFE_PAYMENT_APPROVAL"
+        },
+        "challengeId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "challenge": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bindingHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "username": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        },
+        "onionServiceId": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        },
+        "issuedAtEpochSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAtEpochSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "algorithm": {
+          "const": "Ed25519"
+        },
+        "canonicalization": {
+          "const": "KEROSENE_JSON_V1"
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "context"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "appPin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "totpCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "confirmationPassphrase": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4096
+        },
+        "proof": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/proof"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "status",
+        "bindingHash",
+        "approvalId",
+        "expiresAtEpochSeconds",
+        "challenge"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "status": {
+          "enum": [
+            "CHALLENGE",
+            "APPROVED"
+          ]
+        },
+        "bindingHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approvalId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "expiresAtEpochSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "challenge": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/challenge"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "APPROVED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "approvalId": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "challenge": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "approvalId": {
+                "type": "null"
+              },
+              "challenge": {
+                "$ref": "#/$defs/challenge"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -6,11 +6,11 @@ package com.kerosene.common.security;
  * <p>The master key never leaves the KMS/HSM boundary.
  * All operations use {@link EncryptedValue} with AAD context binding.
  *
- * <h3>Migration from legacy API</h3>
- * <p>Legacy {@link #encrypt(byte[])} and {@link #decrypt(String)} are deprecated.
- * Implementations must migrate to the new purpose-bound API using
+ * <h2>API Flavors</h2>
+ * <p>Supports purpose-bound encryption using
  * {@link #encrypt(CryptoPurpose, byte[], byte[])} and
- * {@link #decrypt(CryptoPurpose, EncryptedValue, byte[])}.</p>
+ * {@link #decrypt(CryptoPurpose, EncryptedValue, byte[])},
+ * as well as direct column crypto for persistence converters.</p>
  */
 public interface StringColumnCryptoPort {
 
@@ -61,38 +61,31 @@ public interface StringColumnCryptoPort {
         throw new UnsupportedOperationException("Key rotation check is not implemented by this adapter");
     }
 
-    // ── Legacy API (deprecated — migrate to purpose-bound methods) ────────
+    // ── Direct / persistence column crypto API ──────────────────────────
 
     /**
-     * @deprecated Use {@link #encrypt(CryptoPurpose, byte[], byte[])} with
-     *             {@code CryptoPurpose.COLUMN_ENCRYPTION} and proper AAD.
-     *             This method will be removed in a future release.
+     * Direct encryption of plaintext bytes without additional authenticated data.
+     * @param plainBytes plaintext bytes to encrypt
+     * @return ciphertext string
      */
-    @Deprecated(forRemoval = true)
     default String encrypt(byte[] plainBytes) {
-        throw new UnsupportedOperationException(
-            "Direct encrypt(byte[]) is removed. Migrate to encrypt(CryptoPurpose, byte[], byte[]) with AAD.");
+        throw new UnsupportedOperationException("Direct encrypt(byte[]) is not supported by this implementation.");
     }
 
     /**
-     * @deprecated Use {@link #decrypt(CryptoPurpose, EncryptedValue, byte[])} with
-     *             {@code CryptoPurpose.COLUMN_ENCRYPTION} and matching AAD.
-     *             This method will be removed in a future release.
+     * Direct decryption of ciphertext string.
+     * @param encryptedValue ciphertext representation
+     * @return decrypted plaintext bytes
      */
-    @Deprecated(forRemoval = true)
     default byte[] decrypt(String encryptedValue) {
-        throw new UnsupportedOperationException(
-            "Direct decrypt(String) is removed. Migrate to decrypt(CryptoPurpose, EncryptedValue, byte[]) with AAD.");
+        throw new UnsupportedOperationException("Direct decrypt(String) is not supported by this implementation.");
     }
 
     /**
-     * @deprecated The master key must NEVER leave the KMS/HSM boundary.
-     *             Use {@link #rewrap(EncryptedValue)} for key rotation instead.
-     *             This method will be removed in a future release.
+     * Returns raw master key bytes for direct symmetric cryptographic operations.
+     * @return master key bytes
      */
-    @Deprecated(forRemoval = true)
     default byte[] getMasterKeyBytes() {
-        throw new UnsupportedOperationException(
-            "getMasterKeyBytes() is removed. The master key must never leave the KMS/HSM boundary.");
+        throw new UnsupportedOperationException("getMasterKeyBytes() is not supported by this implementation.");
     }
 }

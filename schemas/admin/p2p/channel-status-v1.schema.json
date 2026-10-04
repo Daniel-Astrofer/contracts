@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.kerosene.invalid/admin/p2p/channel-status-v1.schema.json",
+  "title": "AdminP2PV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "channel_id",
+    "remote_node_id",
+    "capacity_sats",
+    "local_balance_sats",
+    "remote_balance_sats",
+    "is_active"
+  ],
+  "properties": {
+    "contract_version": {"const": "0.1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "channel_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "remote_node_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "capacity_sats": {"type": "integer", "minimum": 1},
+    "local_balance_sats": {"type": "integer", "minimum": 0},
+    "remote_balance_sats": {"type": "integer", "minimum": 0},
+    "is_active": {"type": "boolean"}
+  }
+}

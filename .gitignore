@@ -1,8 +1,14 @@
 .gradle/
 build/
 target/
+bin/
 *.class
 *.log
 .idea/
 *.iml
+.vscode/
+.DS_Store
+*.orig
+*.swp
+*~
 .smart_build_state.json

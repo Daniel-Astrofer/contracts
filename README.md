@@ -1,26 +1,62 @@
+<!--
+status: active
+audience: internal
+owner: contracts
+source_of_truth: contracts schemas, build files and compatibility tests
+last_reviewed: 2026-10-04
+-->
+
 # Kerosene Contracts
 
-Canonical, versioned protocol contracts for Java, Rust and Dart consumers.
+Contratos de comunicação (*wire contracts*), especificações de esquemas e vetores de teste determinísticos compartilhados entre os serviços do ecossistema Kerosene (`discoveryng-node`, `vault`, `krinse-engine`, `users-authentication` e `server-administration`).
 
-New bank, Vault, identity and rail protocols must be defined here with
-compatibility tests and test vectors. Historical LND protobuf definitions are
-retained only where an active compatibility requirement is documented.
+## Estrutura do Repositório
 
-Documentation: [English](docs/en/README.md) ·
-[Português (Brasil)](docs/pt-BR/README.md)
+```text
+contracts/
+├── build.gradle.kts         # Build Java 21 com publicação de jars, sources e javadocs
+├── Cargo.toml               # Cargo workspace raiz
+├── compatibility/           # Regras de compatibilidade do componente (kerosene.json)
+├── rust/
+│   └── kerosene-contracts/  # Crate Rust com módulos modulares (admin, discovery, ledger, canonical)
+│       ├── src/             # Implementação canônica dos contratos
+│       └── tests/           # Testes de integração e Known Answer Tests (KAT)
+├── schemas/                 # JSON Schemas (Draft 2020-12) versionados por domínio
+│   ├── admin/               # Status, ledger, p2p, onramp, reconciliação e provedores
+│   ├── discovery/           # Trust bundles, peer hello, admissão e membership manifests
+│   └── financial/           # Aprovação de pagamentos
+├── src/
+│   ├── main/java/           # Biblioteca Java dos contratos (records, DTOs e SPIs)
+│   │   ├── com/kerosene/common/financial/
+│   │   │   ├── model/       # Primitivos de domínio e value objects (Bitcoin, hashes, satoshis)
+│   │   │   ├── approval/    # Protocolos de aprovação de pagamentos e multifator (MFA/Passkeys)
+│   │   │   ├── notification/# Eventos assíncronos e auditoria de notificações financeiras
+│   │   │   ├── stomp/       # Envelopes e rotas tipadas para relay STOMP de usuário
+│   │   │   └── operations/  # Portas de administração operacional, rail health e provisionamento
+│   │   ├── com/kerosene/common/vaultmesh/
+│   │   │   ├── intent/      # Intenções de liquidação, reservas e autorização híbrida (PQ)
+│   │   │   ├── settlement/  # Coordenação de assinatura PSBT e descritores de depósito
+│   │   │   └── governance/  # Avanço de épocas diárias e cerimônias de reshare MPC
+│   │   └── io/kerosene/contracts/admin/ # Wire models administrativos do ecossistema
+│   └── test/java/           # Testes JSON e KAT sincronizados com os vetores em Rust
+└── test-vectors/            # Vetores de teste canônicos (.json) compartilhados entre Rust e Java
+```
 
-Discovery and membership v1 are defined by the JSON schemas under
-`schemas/discovery/` and the canonical Rust types in
-`rust/kerosene-contracts`. Signatures use the domain-separated binary
-representation returned by `CanonicalSignable`; arbitrary JSON bytes are never
-signed.
+## Como Executar os Testes
 
-## Compatibility policy
+### Java
+```bash
+./gradlew test
+./gradlew build
+```
 
-Breaking changes use a two-phase rollout:
+### Rust
+```bash
+cargo test
+cargo clippy -- -D warnings
+cargo fmt --check
+```
 
-1. publish v2;
-2. servers accept v1 and v2;
-3. migrate Vaults and clients;
-4. verify that v1 has no consumers;
-5. remove v1 in a later release.
+## Documentação Global
+
+Arquitetura transversal, regras de negócio compartilhadas e infraestrutura/operação global estão no repositório externo [kerosene-global-docs](../../kerosene-global-docs/README.md). A documentação inline de implementação permanece junto ao código neste repositório.

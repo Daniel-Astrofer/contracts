@@ -9,8 +9,19 @@ description = "Kerosene shared contracts for KFE/Core boundaries"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir("test-vectors")
+        }
     }
 }
 
@@ -27,8 +38,23 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-parameters", "-Xlint:deprecation"))
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<Javadoc> {
+    options {
+        (this as StandardJavadocDocletOptions).apply {
+            encoding = "UTF-8"
+            charSet = "UTF-8"
+            addStringOption("Xdoclint:none", "-quiet")
+        }
+    }
 }
 
 publishing {

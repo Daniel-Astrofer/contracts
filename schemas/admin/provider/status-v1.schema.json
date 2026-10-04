@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.kerosene.invalid/admin/provider/status-v1.schema.json",
+  "title": "AdminProviderV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "provider_id",
+    "provider_type",
+    "is_online"
+  ],
+  "properties": {
+    "contract_version": {"const": "0.1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "provider_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "provider_type": {"type": "string", "minLength": 1, "maxLength": 64},
+    "is_online": {"type": "boolean"},
+    "last_heartbeat": {"type": "string", "minLength": 1, "maxLength": 64},
+    "version": {"type": "string", "minLength": 1, "maxLength": 64}
+  }
+}

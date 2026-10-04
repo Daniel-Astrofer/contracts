@@ -1,6 +1,5 @@
 package io.kerosene.contracts.admin;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,7 +10,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.TreeMap;
 
@@ -34,11 +32,15 @@ public final class CanonicalJson {
             .registerModule(new JavaTimeModule())
             .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
+    /** Prevents construction of this deterministic serialization utility. */
     private CanonicalJson() {}
 
     /**
      * Serialize an object to canonical JSON bytes.
      * Keys are sorted recursively, output is compact.
+     * @param value contract object to convert through Jackson
+     * @return UTF-8 bytes of compact JSON with recursively sorted object keys
+     * @throws RuntimeException if the value cannot be represented as JSON
      */
     public static byte[] toBytes(Object value) {
         try {
@@ -52,6 +54,9 @@ public final class CanonicalJson {
 
     /**
      * SHA-256 hash of the canonical JSON bytes.
+     * @param value contract object whose canonical representation is hashed
+     * @return lowercase hexadecimal SHA-256 digest
+     * @throws RuntimeException if serialization fails or SHA-256 is unavailable
      */
     public static String hash(Object value) {
         byte[] bytes = toBytes(value);
@@ -66,6 +71,10 @@ public final class CanonicalJson {
 
     /**
      * Recursively sort all JSON object keys using TreeMap for lexicographic order.
+     */
+    /** Recursively rebuilds objects with lexicographically sorted keys, preserving array order.
+     * @param node JSON subtree to canonicalize
+     * @return canonicalized subtree; scalar nodes are returned unchanged
      */
     private static JsonNode sortNode(JsonNode node) {
         if (node instanceof ObjectNode obj) {

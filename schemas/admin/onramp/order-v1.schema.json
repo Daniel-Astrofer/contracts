@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.kerosene.invalid/admin/onramp/order-v1.schema.json",
+  "title": "AdminOnrampV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "order_id",
+    "fiat_currency",
+    "sats",
+    "provider",
+    "status"
+  ],
+  "properties": {
+    "contract_version": {"const": "0.1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "order_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "user_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "fiat_currency": {"type": "string", "minLength": 1, "maxLength": 16},
+    "fiat_amount": {"type": "string", "minLength": 1, "maxLength": 64},
+    "sats": {"type": "integer", "minimum": 1},
+    "provider": {"type": "string", "minLength": 1, "maxLength": 128},
+    "status": {"type": "string", "minLength": 1, "maxLength": 64},
+    "created_at": {"type": "string", "minLength": 1, "maxLength": 64}
+  }
+}

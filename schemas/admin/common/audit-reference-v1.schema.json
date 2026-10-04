@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.kerosene.invalid/admin/common/audit-reference-v1.schema.json",
+  "title": "AuditReferenceV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "request_id", "occurred_at"],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "occurred_at": {"type": "string", "minLength": 1, "maxLength": 64}
+  }
+}

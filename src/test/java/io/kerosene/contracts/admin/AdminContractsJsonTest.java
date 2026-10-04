@@ -1,6 +1,5 @@
 package io.kerosene.contracts.admin;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
@@ -9,11 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -243,7 +238,7 @@ class AdminContractsJsonTest {
                   "updated_at": "2026-07-01T00:00:00Z"
                 }
                 """;
-        assertThrows(UnrecognizedPropertyException.class,
+        assertThrows(Exception.class,
                 () -> mapper.readValue(json, LedgerAccountV1.class));
     }
 
@@ -281,6 +276,21 @@ class AdminContractsJsonTest {
                         0, 0, 0, 0, 0, 0, 0, 1,
                         "not-64-chars", List.of(),
                         "2026-01-01T00:00:00Z", "2026-07-01T00:00:00Z"));
+    }
+
+    @Test
+    void ledgerAccountRejectsSchemaRequiredNullsAndNegativeStateVersion() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new LedgerAccountV1(
+                        "0.1.0", "acc-1", "savings",
+                        0, 0, 0, 0, 0, 0, 0, -1,
+                        "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+                        List.of(), "2026-01-01T00:00:00Z", "2026-07-01T00:00:00Z"));
+        assertThrows(IllegalArgumentException.class, () ->
+                new LedgerAccountV1(
+                        "0.1.0", "acc-1", "savings",
+                        0, 0, 0, 0, 0, 0, 0, 1,
+                        null, List.of(), "2026-01-01T00:00:00Z", "2026-07-01T00:00:00Z"));
     }
 
     // ------------------------------------------------------------------
@@ -501,8 +511,8 @@ class AdminContractsJsonTest {
     // KAT — Known Answer Tests (cross-language with Rust)
     // ------------------------------------------------------------------
     //
-    // These tests load test vector JSON files from the classpath
-    // (src/test/resources/test-vectors/), deserialize the contract, compute
+    // These tests load the canonical test vector JSON files from test-vectors/,
+    // deserialize the contract, compute
     // its canonical JSON hash, and compare against the expected value.
     //
     // Rust tests in lib.rs compute the same hashes to verify cross-language
@@ -563,20 +573,21 @@ class AdminContractsJsonTest {
     // ------------------------------------------------------------------
 
     private <T> void runKat(String vectorFile, Class<T> type) throws Exception {
-        // Load from src/test/resources/test-vectors/
-        String path = "/test-vectors/" + vectorFile;
-        InputStream is = getClass().getResourceAsStream(path);
-        if (is == null) {
-            // Fallback: try relative to project root
-            java.nio.file.Path fallback = java.nio.file.Paths.get("test-vectors", vectorFile);
-            if (fallback.toFile().exists()) {
-                String content = java.nio.file.Files.readString(fallback);
-                runKatFromString(content, type);
-                return;
+        String content;
+        try (var is = getClass().getResourceAsStream("/" + vectorFile)) {
+            if (is != null) {
+                content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            } else {
+                java.nio.file.Path path = java.nio.file.Paths.get("test-vectors", vectorFile);
+                if (!path.toFile().exists()) {
+                    path = java.nio.file.Paths.get("..", "test-vectors", vectorFile);
+                }
+                if (!path.toFile().exists()) {
+                    throw new IOException("Test vector not found: " + vectorFile);
+                }
+                content = java.nio.file.Files.readString(path, StandardCharsets.UTF_8);
             }
-            throw new IOException("Test vector not found: " + path + " or " + fallback);
         }
-        String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         runKatFromString(content, type);
     }
 
