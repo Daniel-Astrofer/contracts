@@ -6,6 +6,7 @@ package com.kerosene.common.financial.model;
  * @param value 64-character hex-encoded x coordinate of the Taproot public key
  */
 public record XOnlyPublicKey(String value) {
+    /** Hexadecimal character count for one 32-byte x-only public key. */
     private static final int HEX_LENGTH = 64;
 
     /** Validates the encoded key length and alphabet, then canonicalizes letter case.
@@ -19,9 +20,9 @@ public record XOnlyPublicKey(String value) {
         value = value.toLowerCase();
     }
 
-    @Override
     /** Returns the normalized lowercase public key.
      * @return 64-character lowercase hexadecimal key
      */
+    @Override
     public String toString() { return value; }
 }

@@ -8,7 +8,9 @@ import java.util.Arrays;
  * @param value nonce bytes; the stored component is a defensive copy
  */
 public record Nonce(byte[] value) {
+    /** Lower protocol bound preventing weakly sized challenge nonces. */
     private static final int MIN_LENGTH = 12;
+    /** Upper protocol bound keeping signed challenge payloads compact. */
     private static final int MAX_LENGTH = 32;
 
     /** Validates nonce length and stores a defensive copy of the supplied bytes.
@@ -27,25 +29,25 @@ public record Nonce(byte[] value) {
      */
     public byte[] value() { return value.clone(); }
 
-    @Override
     /** Returns a redacted diagnostic representation that never exposes nonce bytes.
      * @return nonce marker containing only its byte length
      */
+    @Override
     public String toString() { return "Nonce[len=" + value.length + "]"; }
 
-    @Override
     /** Compares nonce contents without exposing or converting the bytes.
      * @param o object to compare
      * @return {@code true} when the other value is a nonce with identical bytes
      */
+    @Override
     public boolean equals(Object o) {
         return o instanceof Nonce other && Arrays.equals(value, other.value);
     }
 
-    @Override
     /** Returns the content-based hash required by the value-object equality contract.
      * @return hash derived from nonce bytes
      */
+    @Override
     public int hashCode() {
         return Arrays.hashCode(value);
     }

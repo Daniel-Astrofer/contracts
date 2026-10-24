@@ -13,9 +13,9 @@ public record DayEpoch(String value) {
         if (value == null || value.isBlank()) throw new IllegalArgumentException("day epoch required");
     }
 
-    @Override
     /** Returns the protocol token unchanged.
      * @return epoch token
      */
+    @Override
     public String toString() { return value; }
 }

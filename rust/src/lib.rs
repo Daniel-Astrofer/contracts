@@ -1,14 +1,25 @@
-//! Canonical Kerosene discovery, membership, and admin wire contracts.
+//! Canonical Rust wire contracts shared across Kerosene services.
+//!
+//! The crate defines administrative, discovery and membership, and financial
+//! ledger messages. Discovery contracts also carry member identity and trust-root
+//! data used by the membership protocols.
 //!
 //! Signatures are always calculated over [`CanonicalSignable::signing_bytes`],
 //! never over an arbitrary JSON serialization.
 //!
-//! Cross-language signing uses canonical JSON
-//! ([`canonical_json_bytes`]) which produces the same bytes in Rust and Java.
+//! Cross-language JSON serialization uses [`canonical_json_bytes`] so Rust and
+//! Java produce the same compact representation with sorted object keys.
 
+/// Administrative status, audit, provider, and reconciliation wire contracts.
 pub mod admin;
+
+/// Canonical JSON serialization, hashing, and deterministic signing encodings.
 pub mod canonical;
+
+/// Peer discovery, member identity, trust, and membership wire contracts.
 pub mod discovery;
+
+/// Financial account snapshots and ledger journal wire contracts.
 pub mod ledger;
 
 // ---------------------------------------------------------------------------

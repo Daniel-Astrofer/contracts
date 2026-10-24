@@ -32,10 +32,10 @@ public record FinancialWalletOutboundApprovalRequest(
         if (deviceProof == null) throw new IllegalArgumentException("deviceProof required");
     }
 
-    @Override
     /** Returns a summary delegated to redacting factor types, never raw proof content.
      * @return redacted request summary
      */
+    @Override
     public String toString() {
         return "FinancialWalletOutboundApprovalRequest[actorUserId=" + actorUserId
                 + ", ownerUserId=" + ownerUserId

@@ -17,10 +17,10 @@ contracts/
 ├── build.gradle.kts         # Build Java 21 com publicação de jars, sources e javadocs
 ├── Cargo.toml               # Cargo workspace raiz
 ├── compatibility/           # Regras de compatibilidade do componente (kerosene.json)
-├── rust/
-│   └── kerosene-contracts/  # Crate Rust com módulos modulares (admin, discovery, ledger, canonical)
-│       ├── src/             # Implementação canônica dos contratos
-│       └── tests/           # Testes de integração e Known Answer Tests (KAT)
+├── rust/                   # Crate Rust kerosene-contracts
+│   ├── Cargo.toml          # Manifesto do pacote Rust
+│   ├── src/                # Implementação canônica dos contratos
+│   └── tests/              # Testes de integração e Known Answer Tests (KAT)
 ├── schemas/                 # JSON Schemas (Draft 2020-12) versionados por domínio
 │   ├── admin/               # Status, ledger, p2p, onramp, reconciliação e provedores
 │   ├── discovery/           # Trust bundles, peer hello, admissão e membership manifests
@@ -59,4 +59,7 @@ cargo fmt --check
 
 ## Documentação Global
 
-Arquitetura transversal, regras de negócio compartilhadas e infraestrutura/operação global estão no repositório externo [kerosene-global-docs](../../kerosene-global-docs/README.md). A documentação inline de implementação permanece junto ao código neste repositório.
+- [Documentação Global da Plataforma](../kerosene-global-docs/README.md)
+- [Topografia do Sistema](../kerosene-global-docs/SYSTEM_TOPOGRAPHY.md)
+- [Regras de Domínio e Contabilidade](../kerosene-global-docs/DOMAIN_RULES.md)
+- [Segurança e Identidade](../kerosene-global-docs/SECURITY.md)

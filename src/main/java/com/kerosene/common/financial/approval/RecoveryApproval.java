@@ -26,10 +26,10 @@ public record RecoveryApproval(
         if (generatedAt == null) throw new IllegalArgumentException("generatedAt required");
     }
 
-    @Override
     /** Returns a summary that omits the sensitive proof.
      * @return redacted recovery approval summary
      */
+    @Override
     public String toString() {
         return "RecoveryApproval[challengeNonce=" + challengeNonce + ", generatedAt=" + generatedAt + "]";
     }

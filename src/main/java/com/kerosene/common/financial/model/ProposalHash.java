@@ -6,6 +6,7 @@ package com.kerosene.common.financial.model;
  * @param value hexadecimal digest of the canonical proposal
  */
 public record ProposalHash(String value) {
+    /** Hexadecimal character count for a 32-byte proposal digest. */
     private static final int HEX_LENGTH = 64;
 
     /** Validates a 32-byte hexadecimal digest and normalizes its case.
@@ -19,9 +20,9 @@ public record ProposalHash(String value) {
         value = value.toLowerCase();
     }
 
-    @Override
     /** Returns the normalized proposal digest.
      * @return lowercase 64-character hexadecimal digest
      */
+    @Override
     public String toString() { return value; }
 }

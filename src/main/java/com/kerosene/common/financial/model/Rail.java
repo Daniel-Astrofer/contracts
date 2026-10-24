@@ -8,6 +8,7 @@ import java.util.Set;
  * @param value rail identifier; case-insensitive on input
  */
 public record Rail(String value) {
+    /** Supported canonical settlement rail names accepted by this contract version. */
     private static final Set<String> VALID = Set.of("BITCOIN_ONCHAIN", "LIGHTNING", "INTERNAL");
 
     /** Normalizes case and rejects values outside the supported rails.
@@ -21,9 +22,9 @@ public record Rail(String value) {
         value = upper;
     }
 
-    @Override
     /** Returns the normalized rail name.
      * @return canonical uppercase rail identifier
      */
+    @Override
     public String toString() { return value; }
 }

@@ -8,6 +8,7 @@ import java.util.Set;
  * @param value bucket identifier; currently {@code USERS}, {@code CHANNELS}, or {@code RESERVES}
  */
 public record VaultBucket(String value) {
+    /** Canonical custody buckets recognized by the current Vault Mesh contract. */
     private static final Set<String> VALID = Set.of("USERS", "CHANNELS", "RESERVES");
 
     /** Normalizes the identifier and rejects buckets not supported by this protocol version.
@@ -21,9 +22,9 @@ public record VaultBucket(String value) {
         value = upper;
     }
 
-    @Override
     /** Returns the canonical uppercase bucket name.
      * @return custody bucket identifier
      */
+    @Override
     public String toString() { return value; }
 }

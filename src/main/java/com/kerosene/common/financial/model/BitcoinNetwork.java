@@ -8,6 +8,7 @@ import java.util.Set;
  * @param value one of {@code MAINNET}, {@code TESTNET}, {@code REGTEST}, or {@code SIGNET}
  */
 public record BitcoinNetwork(String value) {
+    /** Canonical network identifiers accepted by this contract version. */
     private static final Set<String> VALID = Set.of("MAINNET", "TESTNET", "REGTEST", "SIGNET");
 
     /** Normalizes the network name and rejects unknown networks.
@@ -21,9 +22,9 @@ public record BitcoinNetwork(String value) {
         value = upper;
     }
 
-    @Override
     /** Returns the canonical uppercase network name.
      * @return Bitcoin network identifier
      */
+    @Override
     public String toString() { return value; }
 }

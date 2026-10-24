@@ -9,8 +9,11 @@ import java.util.regex.Pattern;
  * @param value address text preserved for the wire representation
  */
 public record BitcoinAddress(String value) {
+    /** Lexical validator for legacy and witness-version-zero address prefixes. */
     private static final Pattern BECH32 = Pattern.compile("^(bc|tb|bcrt)1[ac-hj-np-z02-9]{6,}$");
+    /** Lexical validator for Taproot witness-version-one address prefixes. */
     private static final Pattern BECH32M = Pattern.compile("^(bc|tb|bcrt)1p[ac-hj-np-z02-9]{6,}$");
+    /** Lexical validator for legacy Base58Check address alphabets and prefixes. */
     private static final Pattern BASE58 = Pattern.compile("^[13mn][1-9A-HJ-NP-Za-km-z]{25,34}$");
 
     /** Rejects absent text and values outside the supported address formats.
@@ -26,9 +29,9 @@ public record BitcoinAddress(String value) {
         }
     }
 
-    @Override
     /** Returns the address in its original validated representation.
      * @return address text
      */
+    @Override
     public String toString() { return value; }
 }

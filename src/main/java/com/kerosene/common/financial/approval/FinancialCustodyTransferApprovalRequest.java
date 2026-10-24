@@ -20,10 +20,10 @@ public record FinancialCustodyTransferApprovalRequest(
         if (assertion == null) throw new IllegalArgumentException("assertion required");
     }
 
-    @Override
     /** Returns a redacted summary; nested assertion formatting also masks its contents.
      * @return request summary without raw assertion data
      */
+    @Override
     public String toString() {
         return "FinancialCustodyTransferApprovalRequest[userId=" + userId
                 + ", assertion=" + assertion + "]";

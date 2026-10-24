@@ -166,6 +166,7 @@ public interface FinancialTransactionApprovalPort {
                 if (authenticatorData == null || authenticatorData.isBlank()) throw new IllegalArgumentException("authenticatorData required");
                 if (signature == null || signature.isBlank()) throw new IllegalArgumentException("signature required");
             }
+            /** @return stable protocol discriminator identifying a WebAuthn assertion */
             public String factorType() { return "PASSKEY"; }
         }
 
@@ -185,6 +186,7 @@ public interface FinancialTransactionApprovalPort {
                 if (proof == null || proof.isBlank()) throw new IllegalArgumentException("proof required");
                 if (challengeNonce == null || challengeNonce.isBlank()) throw new IllegalArgumentException("challengeNonce required");
             }
+            /** @return stable protocol discriminator identifying an enrolled-device proof */
             public String factorType() { return "DEVICE_PROOF"; }
         }
 
@@ -204,6 +206,7 @@ public interface FinancialTransactionApprovalPort {
                 if (proof == null || proof.isBlank()) throw new IllegalArgumentException("proof required");
                 if (challengeNonce == null || challengeNonce.isBlank()) throw new IllegalArgumentException("challengeNonce required");
             }
+            /** @return stable protocol discriminator identifying a recovery-key assertion */
             public String factorType() { return "RECOVERY"; }
         }
 
@@ -223,6 +226,7 @@ public interface FinancialTransactionApprovalPort {
                 if (proof == null || proof.isBlank()) throw new IllegalArgumentException("proof required");
                 if (challengeNonce == null || challengeNonce.isBlank()) throw new IllegalArgumentException("challengeNonce required");
             }
+            /** @return stable protocol discriminator identifying a custody-provider assertion */
             public String factorType() { return "CUSTODY"; }
         }
     }

@@ -6,6 +6,7 @@ package com.kerosene.common.financial.model;
  * @param value hexadecimal SHA-256 payment hash
  */
 public record PaymentHash(String value) {
+    /** Hexadecimal character count for a 32-byte SHA-256 payment hash. */
     private static final int HEX_LENGTH = 64;
 
     /** Validates the fixed hash length and hexadecimal alphabet, then normalizes case.
@@ -19,9 +20,9 @@ public record PaymentHash(String value) {
         value = value.toLowerCase();
     }
 
-    @Override
     /** Returns the normalized payment hash.
      * @return lowercase 64-character hexadecimal hash
      */
+    @Override
     public String toString() { return value; }
 }

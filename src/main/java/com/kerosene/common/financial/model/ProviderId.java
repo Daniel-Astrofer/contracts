@@ -13,9 +13,9 @@ public record ProviderId(String value) {
         if (value == null || value.isBlank()) throw new IllegalArgumentException("provider id required");
     }
 
-    @Override
     /** Returns the provider identifier unchanged.
      * @return provider identifier
      */
+    @Override
     public String toString() { return value; }
 }

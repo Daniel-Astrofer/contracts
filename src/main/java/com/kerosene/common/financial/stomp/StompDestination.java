@@ -11,6 +11,7 @@ public enum StompDestination {
     /** User queue carrying general platform notifications. */
     QUEUE_NOTIFICATION("/queue/notification");
 
+    /** Exact broker-relative route exposed to the authorized user destination resolver. */
     private final String path;
     /** Associates this enum value with its exact broker-relative queue path.
      * @param path allow-listed STOMP destination path

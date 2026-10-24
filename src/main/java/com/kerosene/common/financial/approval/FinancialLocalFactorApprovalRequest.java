@@ -24,10 +24,10 @@ public record FinancialLocalFactorApprovalRequest(
         if (factor == null) throw new IllegalArgumentException("factor required");
     }
 
-    @Override
     /** Returns a diagnostic summary without rendering raw proof material.
      * @return redacted request summary
      */
+    @Override
     public String toString() {
         return "FinancialLocalFactorApprovalRequest[userId=" + userId
                 + ", deviceRef=" + deviceRef
