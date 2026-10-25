@@ -35,6 +35,28 @@ fn signatures_do_not_change_manifest_hash() {
 }
 
 #[test]
+fn snapshot_attestation_binds_membership_and_payload_but_not_signatures() {
+    let mut attestation = StateSnapshotAttestationV1 {
+        contract_version: DISCOVERY_CONTRACT_VERSION.into(),
+        network_id: "kerosene-test".into(),
+        plane: DiscoveryPlane::Bank,
+        membership_manifest_hash: "1".repeat(64),
+        snapshot_epoch: 7,
+        state_root: "2".repeat(64),
+        created_at_epoch_ms: 42,
+        signatures: vec![],
+    };
+    let unsigned = canonical_hash(&attestation);
+    attestation.signatures.push(ManifestSignature {
+        signer_id: "member-a".into(),
+        signature: "3".repeat(128),
+    });
+    assert_eq!(unsigned, canonical_hash(&attestation));
+    attestation.state_root = "4".repeat(64);
+    assert_ne!(unsigned, canonical_hash(&attestation));
+}
+
+#[test]
 fn canonical_bytes_are_not_ambiguous() {
     let mut left = PeerHelloV1 {
         contract_version: DISCOVERY_CONTRACT_VERSION.into(),
