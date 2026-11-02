@@ -16,6 +16,12 @@ public interface FinancialRailHealthPort {
      */
     List<ProviderHealth> activeRailProviderHealth();
 
+    /** Returns the KFE-owned, authenticated Vault Mesh readiness projection. */
+    MeshHealth vaultMeshHealth();
+
+    /** Readiness is false until a fresh, verified mesh probe has succeeded. */
+    record MeshHealth(boolean ready, String status, Instant checkedAt) {}
+
     /** Normalized operational state for a provider, separate from its individual capabilities. */
     enum HealthState {
         /** Provider is intentionally disabled by configuration or policy. */
