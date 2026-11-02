@@ -7,6 +7,11 @@ import java.util.UUID;
  */
 public interface FinancialNotificationPort {
 
+    /** Delivers an identified event; unsupported adapters must never acknowledge it silently. */
+    default FinancialNotificationReceipt deliverEvent(FinancialNotificationEventRequest event) {
+        throw new UnsupportedOperationException("Durable financial notification delivery is not supported.");
+    }
+
     /** Reports a deposit credited after confirmation requirements were met.
      * @param userId user receiving the event notification
      * @param transactionId platform transaction identifier for correlation

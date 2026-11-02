@@ -30,10 +30,10 @@ public record DeviceProof(
         if (generatedAt == null) throw new IllegalArgumentException("generatedAt required");
     }
 
-    @Override
     /** Returns a diagnostic summary without exposing the proof bytes.
      * @return redacted device-proof summary
      */
+    @Override
     public String toString() {
         return "DeviceProof[deviceId=" + deviceId + ", challengeNonce=" + challengeNonce + ", generatedAt=" + generatedAt + "]";
     }

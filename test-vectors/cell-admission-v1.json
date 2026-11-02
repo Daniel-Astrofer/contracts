@@ -1,0 +1,46 @@
+{
+  "admissionDigest": "sha256:a2029b9f5819ba811c4471bbbc569b6541f84a4160db67afac9fb780f25b2c7f",
+  "canonicalPayloadUtf8": "{\"cellId\":\"cell-example\",\"changeId\":\"change-example\",\"clusterUid\":\"80cf8d2f-172d-4d43-ba99-1734b32184b1\",\"epoch\":1,\"expiresAtUnixSeconds\":1100,\"issuedAtUnixSeconds\":1000,\"networkId\":\"bank-release-governance\",\"nonce\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"operatorId\":\"operator-example\",\"releaseApprovalDigest\":\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"schema\":\"kerosene.cell-admission/v1\"}",
+  "envelope": {
+    "admission": {
+      "cellId": "cell-example",
+      "changeId": "change-example",
+      "clusterUid": "80cf8d2f-172d-4d43-ba99-1734b32184b1",
+      "epoch": 1,
+      "expiresAtUnixSeconds": 1100,
+      "issuedAtUnixSeconds": 1000,
+      "networkId": "bank-release-governance",
+      "nonce": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "operatorId": "operator-example",
+      "releaseApprovalDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "schema": "kerosene.cell-admission/v1"
+    },
+    "signatures": [
+      {
+        "memberId": "validator-1",
+        "signatureBase64": "LFJ+RO6wt10wbs1dx7GWavObbvnf66VlWvYj9eDxGrXKmv2OyZjMw20dJO2JbTmmDg4J61Flyvkt/nOBmro7CQ=="
+      },
+      {
+        "memberId": "validator-2",
+        "signatureBase64": "vkUZ4/0VWBRlXQLuM50dmdJyZDR/UbIzmgPi6B4AHW8h7qSTiGc6l5b6HvjZph2Jr4nLE1UqxOcXrkvt5lAHDw=="
+      },
+      {
+        "memberId": "validator-3",
+        "signatureBase64": "vbEvx5yh3MOPBCm0u8O58f1QXkNwxeyMDQAiHUKxObSELhN6tco/lmRuUET6q//D9JIpAd9ieKZO9RWA/omcBw=="
+      }
+    ]
+  },
+  "fixtureOnly": true,
+  "nowUnixSeconds": 1000,
+  "policy": {
+    "epoch": 1,
+    "members": {
+      "validator-1": "+kg0FH9uaQw2k+/2EzYEZAPNiuKhTzGzxAc1hWkjlWU=",
+      "validator-2": "GX9rI+FshTLGq8g4+s1ep4m+DHaykgM0A5v6iz02jWE=",
+      "validator-3": "RQigeqlBcH8+stuUyIl6gLLBGXR2tt4hOsJz332GxP8=",
+      "validator-4": "lHXGzw7aNAV1KNhpR4HsySrWOdfivSd2HtPvdJJL6wc="
+    },
+    "networkId": "bank-release-governance",
+    "threshold": 3
+  }
+}

@@ -5,6 +5,17 @@ import java.util.List;
 
 /**
  * Versioned, multi-signed membership manifest for a specific plane and epoch.
+ *
+ * @param contractVersion wire contract identifier used for compatibility checks
+ * @param networkId network whose membership is being described
+ * @param plane membership plane governed by this manifest
+ * @param epoch monotonically increasing manifest epoch
+ * @param phase stable single-set membership or joint transition membership
+ * @param previousManifestHash digest linking this epoch to its predecessor
+ * @param threshold minimum number of valid member signatures required for approval
+ * @param members immutable ordered membership set for the epoch
+ * @param nextEpoch optional successor epoch associated with a transition
+ * @param signatures signatures collected for the canonical manifest; may be empty while proposed
  */
 public record MembershipManifestV1(
     @JsonProperty("contract_version") String contractVersion,
@@ -18,6 +29,7 @@ public record MembershipManifestV1(
     @JsonProperty("next_epoch") Long nextEpoch,
     @JsonProperty("signatures") List<ManifestSignature> signatures
 ) {
+    /** Validates manifest identity, epoch, threshold and membership, then defensively freezes collections. */
     public MembershipManifestV1 {
         if (contractVersion == null || contractVersion.isBlank()) throw new IllegalArgumentException("contractVersion required");
         if (networkId == null || networkId.isBlank()) throw new IllegalArgumentException("networkId required");

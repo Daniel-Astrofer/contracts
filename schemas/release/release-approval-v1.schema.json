@@ -1,0 +1,45 @@
+{
+  "$id": "urn:kerosene:release-approval-v1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "epoch": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "networkId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "previousApprovalDigest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "releaseLockCanonicalDigest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "kerosene.release-approval/v1",
+      "type": "string"
+    },
+    "sequence": {
+      "format": "uint64",
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "epoch",
+    "networkId",
+    "previousApprovalDigest",
+    "releaseLockCanonicalDigest",
+    "schema",
+    "sequence"
+  ],
+  "title": "ReleaseApprovalV1",
+  "type": "object"
+}

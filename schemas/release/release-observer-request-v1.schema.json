@@ -1,0 +1,115 @@
+{
+  "$id": "urn:kerosene:release-observer-request-v1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "BankObservationV2": {
+      "additionalProperties": false,
+      "properties": {
+        "observedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "observedSequence": {
+          "format": "uint64",
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observerId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "releaseDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/Compatibility"
+        }
+      },
+      "required": [
+        "observedAt",
+        "observedSequence",
+        "observerId",
+        "releaseDigest",
+        "status"
+      ],
+      "type": "object"
+    },
+    "BankObserverReportPayloadV2": {
+      "additionalProperties": false,
+      "properties": {
+        "expiresAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "issuedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "networkId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/definitions/BankObservationV2"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array"
+        },
+        "releaseId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+          "type": "string"
+        },
+        "releaseLockCanonicalDigest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "schema": {
+          "const": "kerosene.bank-observer-report/v2",
+          "type": "string"
+        },
+        "targetSequence": {
+          "format": "uint64",
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expiresAt",
+        "issuedAt",
+        "networkId",
+        "observations",
+        "releaseId",
+        "releaseLockCanonicalDigest",
+        "schema",
+        "targetSequence"
+      ],
+      "type": "object"
+    },
+    "Compatibility": {
+      "enum": [
+        "compatible",
+        "incompatible",
+        "unknown"
+      ],
+      "type": "string"
+    }
+  },
+  "properties": {
+    "releaseLock": true,
+    "report": {
+      "$ref": "#/definitions/BankObserverReportPayloadV2"
+    }
+  },
+  "required": [
+    "releaseLock",
+    "report"
+  ],
+  "title": "ReleaseObserverRequestV1",
+  "type": "object"
+}

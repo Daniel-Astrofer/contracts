@@ -16,9 +16,9 @@ public record PsbtBase64(String value) {
         if (!value.matches("^[A-Za-z0-9+/=]+$")) throw new IllegalArgumentException("psbt must be valid base64");
     }
 
-    @Override
     /** Returns the encoded PSBT text unchanged.
      * @return Base64 PSBT
      */
+    @Override
     public String toString() { return value; }
 }

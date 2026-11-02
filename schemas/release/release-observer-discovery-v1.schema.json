@@ -1,0 +1,61 @@
+{
+  "$id": "urn:kerosene:release-observer-discovery-v1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "CommitCertificateAvailability": {
+      "enum": [
+        "unavailable"
+      ],
+      "type": "string"
+    }
+  },
+  "properties": {
+    "bankObservers": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "type": "array"
+    },
+    "commitCertificate": {
+      "$ref": "#/definitions/CommitCertificateAvailability"
+    },
+    "maxReportLifetimeSeconds": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "networkId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "observerId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$",
+      "type": "string"
+    },
+    "publicKeyDerBase64": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reportSchema": {
+      "type": "string"
+    },
+    "schema": {
+      "const": "kerosene.release-observer-discovery/v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bankObservers",
+    "commitCertificate",
+    "maxReportLifetimeSeconds",
+    "networkId",
+    "observerId",
+    "publicKeyDerBase64",
+    "reportSchema",
+    "schema"
+  ],
+  "title": "ObserverDiscoveryV1",
+  "type": "object"
+}

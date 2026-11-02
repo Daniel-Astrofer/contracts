@@ -15,6 +15,8 @@ pub const ADMISSION_REQUEST_DOMAIN: &[u8] = b"KEROSENE_ADMISSION_REQUEST_V1";
 pub const MEMBERSHIP_MANIFEST_DOMAIN: &[u8] = b"KEROSENE_MEMBERSHIP_MANIFEST_V1";
 /// Domain-separation bytes for genesis trust-bundle signatures.
 pub const GENESIS_TRUST_BUNDLE_DOMAIN: &[u8] = b"KEROSENE_GENESIS_TRUST_BUNDLE_V1";
+/// Domain-separation bytes for signed membership-bound state snapshots.
+pub const STATE_SNAPSHOT_ATTESTATION_DOMAIN: &[u8] = b"KEROSENE_STATE_SNAPSHOT_ATTESTATION_V1";
 
 /// Membership plane whose nodes share one trust and discovery configuration.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -182,6 +184,31 @@ pub struct MembershipManifestV1 {
     pub signatures: Vec<ManifestSignature>,
 }
 
+/// Threshold-signed binding between a membership epoch and an external state snapshot.
+///
+/// The payload is transported separately. A verifier must hash that payload and
+/// compare the result with `state_root` before accepting the attestation.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StateSnapshotAttestationV1 {
+    /// Wire-contract version expected by the serializer and consumer.
+    pub contract_version: String,
+    /// Identifier of the distributed network this attestation belongs to.
+    pub network_id: String,
+    /// Membership plane whose threshold signs the snapshot.
+    pub plane: DiscoveryPlane,
+    /// Digest of the membership manifest governing the signing members.
+    pub membership_manifest_hash: String,
+    /// Membership epoch represented by the external state snapshot.
+    pub snapshot_epoch: u64,
+    /// SHA-256 root of the separately transported snapshot payload.
+    pub state_root: String,
+    /// Attestation creation time as Unix epoch milliseconds.
+    pub created_at_epoch_ms: u64,
+    /// Member signatures over the canonical attestation fields.
+    pub signatures: Vec<ManifestSignature>,
+}
+
 impl CanonicalSignable for GenesisTrustBundleV1 {
     fn signing_bytes(&self) -> Vec<u8> {
         let mut out = domain(GENESIS_TRUST_BUNDLE_DOMAIN);
@@ -254,6 +281,20 @@ impl CanonicalSignable for MembershipManifestV1 {
             }
             None => field(&mut out, b"none"),
         }
+        out
+    }
+}
+
+impl CanonicalSignable for StateSnapshotAttestationV1 {
+    fn signing_bytes(&self) -> Vec<u8> {
+        let mut out = domain(STATE_SNAPSHOT_ATTESTATION_DOMAIN);
+        field(&mut out, self.contract_version.as_bytes());
+        field(&mut out, self.network_id.as_bytes());
+        field(&mut out, self.plane.as_str().as_bytes());
+        field(&mut out, self.membership_manifest_hash.as_bytes());
+        integer(&mut out, self.snapshot_epoch);
+        field(&mut out, self.state_root.as_bytes());
+        integer(&mut out, self.created_at_epoch_ms);
         out
     }
 }

@@ -14,9 +14,9 @@ public record PolicyHash(String value) {
         if (value.length() < 32) throw new IllegalArgumentException("policy hash too short: " + value.length());
     }
 
-    @Override
     /** Returns the digest in its original representation.
      * @return policy digest
      */
+    @Override
     public String toString() { return value; }
 }

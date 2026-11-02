@@ -62,6 +62,7 @@ public final class FinancialPaymentApprovalV1 {
          * @return false only for Lightning payments
          */
         public boolean requiresPin() { return !"LIGHTNING".equals(rail); }
+        /** Redacts payment identifiers, memos and values from diagnostics. */
         @Override public String toString() { return "FinancialPaymentContextV1[REDACTED]"; }
     }
 
@@ -80,6 +81,7 @@ public final class FinancialPaymentApprovalV1 {
             if (version != 1 || !PROOF_TYPE.equals(type)) { throw invalid(); }
             required(credentialId, 128); required(deviceInstallId, 128); required(signedPayload, 8192); required(signature, 128);
         }
+        /** Redacts signature material and credential identifiers from diagnostics. */
         @Override public String toString() { return "FinancialPaymentProofV1[REDACTED]"; }
     }
 
@@ -98,6 +100,7 @@ public final class FinancialPaymentApprovalV1 {
             if (version != 1 || context == null) { throw invalid(); }
             optional(appPin, 128); optional(totpCode, 128); optional(confirmationPassphrase, 4096);
         }
+        /** Redacts PIN, one-time codes, passphrases and proof from diagnostics. */
         @Override public String toString() { return "FinancialPaymentRequestV1[REDACTED]"; }
     }
 
@@ -126,6 +129,7 @@ public final class FinancialPaymentApprovalV1 {
                     || expiresAtEpochSeconds <= issuedAtEpochSeconds
                     || expiresAtEpochSeconds - issuedAtEpochSeconds > 120) { throw invalid(); }
         }
+        /** Redacts challenge and binding material so logs cannot be reused as approval proofs. */
         @Override public String toString() { return "FinancialPaymentChallengeV1[REDACTED]"; }
     }
 
@@ -151,6 +155,7 @@ public final class FinancialPaymentApprovalV1 {
                         || expiresAtEpochSeconds > 9_007_199_254_740_991L) { throw invalid(); }
             } else { throw invalid(); }
         }
+        /** Redacts response proof and echoes only the non-sensitive status. */
         @Override public String toString() { return "FinancialPaymentResponseV1[status=" + status + ", REDACTED]"; }
     }
 
@@ -198,7 +203,13 @@ public final class FinancialPaymentApprovalV1 {
         return canonicalJson(values);
     }
 
-    /** Flat JSON subset has no floats, nested maps or arrays; escaping matches the shared UTF-8 vector. */
+    /**
+     * Serializes a sorted flat JSON object. This protocol subset permits only strings and scalar
+     * values; deterministic key order and escaping keep the signed bytes interoperable.
+     *
+     * @param values sorted protocol fields to encode
+     * @return compact canonical JSON text
+     */
     private static String canonicalJson(TreeMap<String, Object> values) {
         var result = new StringBuilder("{"); boolean first = true;
         for (var entry : values.entrySet()) {
@@ -210,6 +221,7 @@ public final class FinancialPaymentApprovalV1 {
         return result.append('}').toString();
     }
 
+    /** Appends one JSON string using the protocol's shared control-character escaping rules. */
     private static void appendString(StringBuilder target, String value) {
         target.append('"');
         for (int i = 0; i < value.length(); i++) {
@@ -229,8 +241,14 @@ public final class FinancialPaymentApprovalV1 {
         target.append('"');
     }
 
+    /** Requires a lowercase SHA-256 digest encoded as exactly 64 hexadecimal characters. */
     private static void hex(String value) { if (value == null || !value.matches("[0-9a-f]{64}")) { throw invalid(); } }
+    /** Enforces a nonblank required string and then applies the protocol's length/Unicode checks. */
     private static void required(String value, int max) { if (value == null || value.isBlank()) { throw invalid(); } optional(value, max); }
+    /**
+     * Validates an optional string's maximum UTF-16 length and rejects unpaired surrogates so the
+     * canonical UTF-8 encoding is deterministic across language implementations.
+     */
     private static void optional(String value, int max) {
         if (value == null) { return; }
         if (value.length() > max) { throw invalid(); }
@@ -241,5 +259,6 @@ public final class FinancialPaymentApprovalV1 {
             } else if (Character.isLowSurrogate(c)) { throw invalid(); }
         }
     }
+    /** Returns the protocol's non-specific validation error to avoid echoing sensitive input. */
     private static IllegalArgumentException invalid() { return new IllegalArgumentException("Invalid financial payment approval v1"); }
 }

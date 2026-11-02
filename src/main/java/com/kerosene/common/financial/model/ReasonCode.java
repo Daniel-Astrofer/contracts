@@ -13,9 +13,9 @@ public record ReasonCode(String value) {
         if (value == null || value.isBlank()) throw new IllegalArgumentException("reason code required");
     }
 
-    @Override
     /** Returns the reason token unchanged.
      * @return protocol reason token
      */
+    @Override
     public String toString() { return value; }
 }

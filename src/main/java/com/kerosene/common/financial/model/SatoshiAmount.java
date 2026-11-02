@@ -13,9 +13,9 @@ public record SatoshiAmount(long sats) {
         if (sats < 0) throw new IllegalArgumentException("sats must be >= 0, got: " + sats);
     }
 
-    @Override
     /** Returns the amount as base-10 integer text.
      * @return satoshi count without a unit suffix
      */
+    @Override
     public String toString() { return String.valueOf(sats); }
 }

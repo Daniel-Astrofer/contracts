@@ -20,10 +20,10 @@ public record FinancialColdWalletPsbtApprovalRequest(
         if (factor == null) throw new IllegalArgumentException("factor required");
     }
 
-    @Override
     /** Returns a redacted diagnostic summary using the proof type's safe rendering.
      * @return request summary without raw factor contents
      */
+    @Override
     public String toString() {
         return "FinancialColdWalletPsbtApprovalRequest[userId=" + userId
                 + ", factor=" + factor + "]";

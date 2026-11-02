@@ -27,6 +27,7 @@ import java.util.TreeMap;
  */
 public final class CanonicalJson {
 
+    /** Shared Jackson configuration for deterministic cross-language contract serialization. */
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
             .registerModule(new JavaTimeModule())

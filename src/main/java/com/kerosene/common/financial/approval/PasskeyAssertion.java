@@ -31,10 +31,10 @@ public record PasskeyAssertion(
         if (signature == null || signature.isBlank()) throw new IllegalArgumentException("signature required");
     }
 
-    @Override
     /** Summarizes the credential without exposing ceremony data or signature.
      * @return redacted assertion summary
      */
+    @Override
     public String toString() {
         return "PasskeyAssertion[credentialId=" + credentialId + ", userHandle=" + (userHandle != null ? "***" : "null") + "]";
     }

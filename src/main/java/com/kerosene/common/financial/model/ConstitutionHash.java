@@ -14,9 +14,9 @@ public record ConstitutionHash(String value) {
         if (value.length() < 32) throw new IllegalArgumentException("constitution hash too short: " + value.length());
     }
 
-    @Override
     /** Returns the digest in its original representation.
      * @return constitution digest
      */
+    @Override
     public String toString() { return value; }
 }
