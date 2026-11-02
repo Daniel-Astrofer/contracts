@@ -17,7 +17,7 @@ jobs:
   java:
     uses: Daniel-Astrofer/.github/.github/workflows/java-ci.yml@2552ff2125c2d72accebe93804b8e139a52ded13
     with:
-      gradle-arguments: test
+      gradle-arguments: test publishJavaPublicationToLocalBuildRepository
 
   rust:
     uses: Daniel-Astrofer/.github/.github/workflows/rust-ci.yml@2552ff2125c2d72accebe93804b8e139a52ded13

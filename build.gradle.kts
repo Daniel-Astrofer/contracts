@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.kerosene.contracts"
-version = "0.2.0-SNAPSHOT"
+version = "0.3.0"
 description = "Kerosene shared contracts for KFE/Core boundaries"
 
 java {
@@ -61,6 +61,24 @@ publishing {
     publications {
         create<MavenPublication>("java") {
             from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            name = "localBuild"
+            url = layout.buildDirectory.dir("repo").get().asFile.toURI()
+        }
+        maven {
+            name = "GitHubPackages"
+            url = uri(
+                providers.environmentVariable("CONTRACTS_MAVEN_URL")
+                    .orElse("https://maven.pkg.github.com/Daniel-Astrofer/contracts")
+                    .get()
+            )
+            credentials {
+                username = providers.environmentVariable("GITHUB_ACTOR").orNull
+                password = providers.environmentVariable("GITHUB_TOKEN").orNull
+            }
         }
     }
 }
