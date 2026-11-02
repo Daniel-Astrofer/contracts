@@ -802,3 +802,75 @@ kat_binary_test!(
     "admin-provider-v1.json",
     "expected_binary_hash"
 );
+
+fn schemas_dir() -> String {
+    let candidates: Vec<&str> = vec!["../../schemas", "schemas", "../schemas"];
+    for c in &candidates {
+        if std::path::Path::new(c).exists() {
+            return c.to_string();
+        }
+    }
+    panic!("cannot find schemas directory (tried: {candidates:?})");
+}
+
+fn validate_vector_against_schema(vector_file: &str, schema_rel_path: &str) {
+    let v_dir = vectors_dir();
+    let s_dir = schemas_dir();
+    let v_path = std::path::Path::new(&v_dir).join(vector_file);
+    let s_path = std::path::Path::new(&s_dir).join(schema_rel_path);
+    let raw_vector = load_json(v_path.to_str().unwrap());
+    let payload = strip_vector_meta(raw_vector);
+    let schema = load_json(s_path.to_str().unwrap());
+    let validator = jsonschema::validator_for(&schema)
+        .unwrap_or_else(|e| panic!("invalid JSON schema {schema_rel_path}: {e}"));
+    assert!(
+        validator.is_valid(&payload),
+        "test vector {vector_file} failed schema validation against {schema_rel_path}"
+    );
+}
+
+#[test]
+fn kat_vectors_conform_to_canonical_json_schemas() {
+    let cases = [
+        (
+            "node-admin-status-v1.json",
+            "admin/node/status-v1.schema.json",
+        ),
+        (
+            "vault-admin-status-v1.json",
+            "admin/vault/status-v1.schema.json",
+        ),
+        (
+            "admin-error-envelope-v1.json",
+            "admin/common/error-envelope-v1.schema.json",
+        ),
+        (
+            "audit-reference-v1.json",
+            "admin/common/audit-reference-v1.schema.json",
+        ),
+        (
+            "ledger-account-v1.json",
+            "admin/core/ledger-account-v1.schema.json",
+        ),
+        (
+            "ledger-journal-v1.json",
+            "admin/core/ledger-journal-v1.schema.json",
+        ),
+        (
+            "admin-p2p-v1.json",
+            "admin/p2p/channel-status-v1.schema.json",
+        ),
+        ("admin-onramp-v1.json", "admin/onramp/order-v1.schema.json"),
+        (
+            "admin-reconciliation-v1.json",
+            "admin/reconciliation/report-v1.schema.json",
+        ),
+        (
+            "admin-provider-v1.json",
+            "admin/provider/status-v1.schema.json",
+        ),
+    ];
+    for (vector_file, schema_path) in cases {
+        validate_vector_against_schema(vector_file, schema_path);
+    }
+}
